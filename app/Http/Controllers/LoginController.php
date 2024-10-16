@@ -10,13 +10,13 @@ use App\Models\User;
 class LoginController extends Controller
 {
     // Показать форму логина
-    public function showLoginForm(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
+    public function showLoginForm()
     {
         return view('auth.login');
     }
 
     // Обработка входа
-    public function login(Request $request): \Illuminate\Http\RedirectResponse
+    public function login(Request $request)
     {
         // Валидация данных
         $credentials = $request->validate([
@@ -37,7 +37,7 @@ class LoginController extends Controller
     }
 
     // обработка выхода
-    public function logout(Request $request): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function logout(Request $request)
     {
         Auth::logout();
         return redirect('/login')->with('success', 'Вы вышли из системы.');

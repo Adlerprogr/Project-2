@@ -23,6 +23,12 @@ services:
       - .:/var/www/html
     depends_on:
       - db
+      - rabbitmq
+    environment:
+        - RABBITMQ_HOST=rabbitmq # Имя сервиса RabbitMQ в docker-compose
+        - RABBITMQ_PORT=5672 # Порт для RabbitMQ
+        - RABBITMQ_USER=guest
+        - RABBITMQ_PASSWORD=guest
 
   db:
     image: postgres:16.2
@@ -35,3 +41,13 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "54323:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    restart: always
+    environment:
+        - RABBITMQ_DEFAULT_USER=guest
+        - RABBITMQ_DEFAULT_PASS=guest
