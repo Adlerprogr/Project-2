@@ -37,7 +37,7 @@ class RegistrationController extends Controller
         ]);
 
         // Отправляем письмо подтверждения
-        Mail::to($user->email)->send(new MyMail($user));
+        Mail::to($user->email)->send(new MyMail($user, 'emails.welcome'));
 
         // Можно автоматически залогинить пользователя или перенаправить на страни
         // auth()->login($user);

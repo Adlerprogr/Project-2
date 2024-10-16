@@ -5,27 +5,27 @@
 <main>
 
     <section class="checkout-form">
-        <form action="{{ route('order') }}" method="POST">
+        <form action="{{ route('order.add') }}" method="POST">
             <h6>Контактная информация</h6>
             <div class="form-control">
                 <label for="last_name">Ваше имя *</label>
                 <div>
                     <span class="fa fa-envelope"></span>
-                    <input type="text" id="last_name" name="last_name" placeholder="Enter your email...">
+                    <input type="text" id="last_name" name="last_name" placeholder="Введите ваше имя...">
                 </div>
             </div>
             <div class="form-control">
-                <label for="checkout-email">E-mail *</label>
+                <label for="email">E-mail *</label>
                 <div>
                     <span class="fa fa-envelope"></span>
-                    <input type="email" id="checkout-email" name="checkout-email" placeholder="Enter your email...">
+                    <input type="email" id="email" name="email" placeholder="Введите ваш email...">
                 </div>
             </div>
             <div class="form-control">
-                <label for="checkout-phone">Телефон *</label>
+                <label for="phone">Телефон *</label>
                 <div>
                     <span class="fa fa-phone"></span>
-                    <input type="tel" name="checkout-phone" id="checkout-phone" placeholder="Enter you phone...">
+                    <input type="tel" name="phone" id="phone" placeholder="Введите ваш телефон...">
                 </div>
             </div>
             <br>
@@ -34,49 +34,49 @@
                 <label for="address">Адрес Доставки *</label>
                 <div>
                     <span class="fa fa-home"></span>
-                    <input type="text" name="address" id="address" placeholder="Your address...">
+                    <input type="text" name="address" id="address" placeholder="Введите адрес доставки...">
                 </div>
             </div>
             <div class="form-control">
                 <label for="entrance">Подъезд</label>
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="entrance" name="entrance" placeholder="Enter you name...">
+                    <input type="text" id="entrance" name="entrance" placeholder="Введите подъезд...">
                 </div>
             </div>
             <div class="form-control">
                 <label for="floor">Этаж</label>
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="floor" name="floor" placeholder="Enter you name...">
+                    <input type="text" id="floor" name="floor" placeholder="Введите этаж...">
                 </div>
             </div>
             <div class="form-control">
                 <label for="flat">Квартира</label>
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="flat" name="flat" placeholder="Enter you name...">
+                    <input type="text" id="flat" name="flat" placeholder="Введите номер квартиры...">
                 </div>
             </div>
             <div class="form-control">
                 <label for="intercom">Домофон</label>
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="intercom" name="intercom" placeholder="Enter you name...">
+                    <input type="text" id="intercom" name="intercom" placeholder="Введите ко домофона...">
                 </div>
             </div>
             <div class="form-control">
                 <label for="comment">Комментарий к заказу</label>
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="comment" name="comment" placeholder="Enter you name...">
+                    <input type="text" id="comment" name="comment" placeholder="Введите комментарий к заказу...">
                 </div>
             </div>
             <div class="form-control">
                 <label for="city">Город *</label>
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="city" name="city" placeholder="Enter you name...">
+                    <input type="text" id="city" name="city" placeholder="Введите ваш город...">
                 </div>
             </div>
             <div class="form-group">
@@ -100,6 +100,7 @@
 {{--                <input type="checkbox" name="checkout-checkbox" id="checkout-checkbox">--}}
 {{--                <label for="checkout-checkbox">Save this information for next time</label>--}}
 {{--            </div>--}}
+            @csrf
             <div class="form-control-btn">
                 <button>Оформить</button>
             </div>

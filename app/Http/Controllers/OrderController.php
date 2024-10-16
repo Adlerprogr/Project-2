@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\MyMail;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\User;
 use App\Models\UserProduct;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CartController;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -69,6 +72,11 @@ class OrderController extends Controller
         }
 
         UserProduct::where('user_id', $userId)->delete();
+
+        $user = User::find($userId);
+
+        // Отправляем письмо подтверждения
+        Mail::to($order->email)->send(new MyMail($user, $order, 'emails.orderPlaced'));
 
         return redirect('/main');
     }

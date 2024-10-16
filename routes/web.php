@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ImageController;
-use App\Http\Controllers\MailController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +34,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/product/{id}', [ProductController::class, 'productPage'])->name('product.show');
 
     Route::get('/order', [OrderController::class, 'orderPage'])->name('order');
-    Route::post('/order', [OrderController::class, 'addOrder'])->name('order.add');
+    Route::post('/order.add', [OrderController::class, 'addOrder'])->name('order.add');
 });
 
 //Route::resource('main', MainController::class);
