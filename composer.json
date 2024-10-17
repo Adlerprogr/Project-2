@@ -10,7 +10,8 @@
         "illuminate/mail": "*",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
-        "swiftmailer/swiftmailer": "^5.4"
+        "swiftmailer/swiftmailer": "^5.4",
+        "php-amqplib/php-amqplib": "^3.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

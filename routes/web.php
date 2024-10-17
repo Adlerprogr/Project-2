@@ -3,6 +3,7 @@
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RabbitMQController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\LoginController;
@@ -35,6 +36,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/order', [OrderController::class, 'orderPage'])->name('order');
     Route::post('/order.add', [OrderController::class, 'addOrder'])->name('order.add');
+
+    Route::get('/send-message', [RabbitMQController::class, 'sendMessage'])->name('send-message');
+    Route::get('/receive-message', [RabbitMQController::class, 'receiveMessage'])->name('receive-message');
 });
 
 //Route::resource('main', MainController::class);
