@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Mail;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class OrderController extends Controller
 {
@@ -76,7 +78,27 @@ class OrderController extends Controller
         $user = User::find($userId);
 
         // Отправляем письмо подтверждения
-        Mail::to($order->email)->send(new MyMail($user, $order, 'emails.orderPlaced'));
+//        Mail::to($order->email)->send(new MyMail($user, $order, 'emails.orderPlaced'));
+        // Запуск консумера (не рекомендуется)
+        exec('php /path/to/your/artisan email:consume > /dev/null 2>&1 &');
+
+        // Отправляем письмо подтверждения в очередь RabbitMQ
+        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $channel = $connection->channel();
+
+        $channel->queue_declare('email_queue', false, false, false, false);
+
+        $emailData = json_encode([
+            'email' => $order->email,
+            'user' => $user->id,
+            'order' => $order->id
+        ]);
+
+        $msg = new AMQPMessage($emailData);
+        $channel->basic_publish($msg, '', 'email_queue');
+
+        $channel->close();
+        $connection->close();
 
         return redirect('/main');
     }
