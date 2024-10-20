@@ -15,7 +15,13 @@
                             <p>{{ $product->weight }} г.</p>
                             <h2>{{ $product->name }}</h2>
                             <div class="price-order">
-                                <span class="price">{{ $product->price }} ₽</span>
+                                <span class="price">
+                                    @if($showInUSD)
+                                        {{ number_format($product->price * $exchangeRate, 2) }} $
+                                    @else
+                                        {{ number_format($product->price, 2) }} ₽
+                                    @endif
+                                </span>
                             </div>
                             <div class="quantity_inner">
                                 <form name='delete_product' action="{{ route('delete-product') }}" method="POST">

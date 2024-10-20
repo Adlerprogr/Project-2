@@ -21,6 +21,14 @@
         </div>
     </div>
     <ul class="nav active">
+        <form action="{{ route('convert.prices') }}" method="POST">
+            @csrf
+            <button type="submit">Показать в долларах</button>
+        </form>
+        <form action="{{ route('show.in.rubles') }}" method="POST">
+            @csrf
+            <button type="submit">Показать в рублях</button>
+        </form>
         <li><a href="#" class="active">HOME</a></li>
         <li><a href="#">MENU</a></li>
         <li><a href="#">FEATURES</a></li>

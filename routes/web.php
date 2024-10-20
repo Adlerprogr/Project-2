@@ -24,7 +24,8 @@ Route:: post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => 'auth'], function () {
     // Все маршруты в этой группе требуют авторизации
-    Route::get('/main', [MainController::class, 'mainPage'])->name('main');
+//    Route::get('/main', [MainController::class, 'mainPage'])->name('main');
+    Route::get('/main/{showInUSD?}', [MainController::class, 'mainPage'])->name('main');
 
     Route::get('/cart', [CartController::class, 'cartPage'])->name('cart');
 
@@ -39,6 +40,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/send-message', [RabbitMQController::class, 'sendMessage'])->name('send-message');
     Route::get('/receive-message', [RabbitMQController::class, 'receiveMessage'])->name('receive-message');
+
+    Route::post('/convert-prices', [MainController::class, 'convertPrices'])->name('convert.prices');
+    Route::post('/show-in-rubles', [MainController::class, 'showInRubles'])->name('show.in.rubles');
 });
 
 //Route::resource('main', MainController::class);
