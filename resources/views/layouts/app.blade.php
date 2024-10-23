@@ -15,7 +15,7 @@
                     <img src="https://i.postimg.cc/JnYk3vLm/icon_cart.png" alt="Cart">
                 </div>
                 <button class="cart-button" type="submit">
-                    <span style="color: #121618">{{ $totalQuantity }} шт</span>
+                    <span style="color: #121618">{{$totals['totalQuantity']}} шт</span>
                 </button>
             </a>
         </div>

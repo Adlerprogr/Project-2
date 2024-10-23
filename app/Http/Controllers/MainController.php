@@ -4,50 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\UserProduct;
-use Illuminate\Http\Request;
+use App\Services\CartService;
+use App\Services\CurrencyService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 
 
 class MainController extends Controller
 {
+    private CartService $cartService;
+    private CurrencyService $currencyService;
+
+    public function __construct(CartService $cartService, CurrencyService $currencyService)
+    {
+        $this->cartService = $cartService;
+        $this->currencyService = $currencyService;
+    }
+
     public function mainPage($showInUSD = false)
     {
-        $userId = Auth::id();
         $products = Product::all();
 
-        $totalQuantity = 0;
-        if ($userId) {
-            $userProducts = UserProduct::where('user_id', $userId)->first();
+        $userProducts = UserProduct::where('user_id', Auth::id())
+            ->orderBy('id')
+            ->get();
 
-            if ($userProducts) {
-                $totalQuantity = UserProduct::where('user_id', $userId)->sum('quantity');
-            }
-        }
+        $totals = $this->cartService->totals($userProducts);
 
-        $exchangeRate = null; // Инициализируем переменную
+        $exchangeRate = null;
 
-        // Если необходимо показывать в долларах
         if ($showInUSD) {
-            $exchangeRate = $this->getExchangeRate();
+            $exchangeRate = $this->currencyService->getExchangeRate();
             if ($exchangeRate) {
                 $products = $products->map(function ($product) use ($exchangeRate) {
-                    $product->price_usd = $product->price * $exchangeRate; // Конвертация
+                    $product->price_usd = $this->currencyService->convertPrice($product->price, $exchangeRate);
                     return $product;
                 });
             }
         }
 
-        return view('main', compact('products', 'totalQuantity', 'showInUSD', 'exchangeRate'));
-    }
-
-    public function getExchangeRate()
-    {
-        $response = Http::get('https://api.exchangerate-api.com/v4/latest/RUB'); // URL для получения курса
-        $data = $response->json();
-
-        return $data['rates']['USD'] ?? null; // Возвращает курс доллара
+        return view('main', compact('products', 'totals', 'showInUSD', 'exchangeRate'));
     }
 
     public function convertPrices()

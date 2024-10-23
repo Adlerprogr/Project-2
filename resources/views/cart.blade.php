@@ -55,15 +55,15 @@
     <div class="cost-box">
         <div>
             <p>Доставка:</p>
-            <p>{{$deliveryAmount}} ₽</p>
+            <p>{{$totals['deliveryAmount']}} ₽</p>
         </div>
         <div>
             <p>Итого:</p>
-            <p class="VAT">{{$totalPrice}} ₽</p>
+            <p class="VAT">{{$totals['totalPrice']}} ₽</p>
         </div>
         <div>
             <p>Всего к оплате:</p>
-            <p class="NOK">{{$totalToBePaid}} ₽</p>
+            <p class="NOK">{{$totals['totalToBePaid']}} ₽</p>
         </div>
 {{--        <p class="gift">Got a gift card or a promotional code?</p>--}}
         <span class="applied">Promo Applied</span>

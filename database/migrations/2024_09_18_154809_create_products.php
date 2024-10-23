@@ -23,8 +23,8 @@ return new class extends Migration
             $table->integer('carbohydrates');
             $table->integer('weight');
             $table->decimal('price', 10, 2);
-            $table->unsignedBigInteger('image_id');
-            $table->foreign('image_id')->references('id')->on('images'); // Предполагая "images" таблица существует
+//            $table->unsignedBigInteger('image_id');
+//            $table->foreign('image_id')->references('id')->on('images'); // Предполагая "images" таблица существует
             $table->integer('quantity');
             $table->timestamps();
         });

@@ -7,99 +7,144 @@
     <section class="checkout-form">
         <form action="{{ route('order.add') }}" method="POST">
             <h6>Контактная информация</h6>
+
             <div class="form-control">
                 <label for="last_name">Ваше имя *</label>
+                @error('last_name')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-envelope"></span>
-                    <input type="text" id="last_name" name="last_name" placeholder="Введите ваше имя...">
+                    <input type="text" id="last_name" name="last_name" placeholder="Введите ваше имя..." value="{{ old('last_name') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="email">E-mail *</label>
+                @error('email')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-envelope"></span>
-                    <input type="email" id="email" name="email" placeholder="Введите ваш email...">
+                    <input type="email" id="email" name="email" placeholder="Введите ваш email..." value="{{ old('email') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="phone">Телефон *</label>
+                @error('phone')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-phone"></span>
-                    <input type="tel" name="phone" id="phone" placeholder="Введите ваш телефон...">
+                    <input type="tel" name="phone" id="phone" placeholder="Введите ваш телефон..." value="{{ old('phone') }}">
                 </div>
             </div>
+
             <br>
             <h6>Доставка</h6>
+
             <div class="form-control">
                 <label for="address">Адрес Доставки *</label>
+                @error('address')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-home"></span>
-                    <input type="text" name="address" id="address" placeholder="Введите адрес доставки...">
+                    <input type="text" name="address" id="address" placeholder="Введите адрес доставки..." value="{{ old('address') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="entrance">Подъезд</label>
+                @error('entrance')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="entrance" name="entrance" placeholder="Введите подъезд...">
+                    <input type="text" id="entrance" name="entrance" placeholder="Введите подъезд..." value="{{ old('entrance') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="floor">Этаж</label>
+                @error('floor')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="floor" name="floor" placeholder="Введите этаж...">
+                    <input type="text" id="floor" name="floor" placeholder="Введите этаж..." value="{{ old('floor') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="flat">Квартира</label>
+                @error('flat')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="flat" name="flat" placeholder="Введите номер квартиры...">
+                    <input type="text" id="flat" name="flat" placeholder="Введите номер квартиры..." value="{{ old('flat') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="intercom">Домофон</label>
+                @error('intercom')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="intercom" name="intercom" placeholder="Введите ко домофона...">
+                    <input type="text" id="intercom" name="intercom" placeholder="Введите ко домофона..." value="{{ old('intercom') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="comment">Комментарий к заказу</label>
+                @error('comment')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="comment" name="comment" placeholder="Введите комментарий к заказу...">
+                    <input type="text" id="comment" name="comment" placeholder="Введите комментарий к заказу..." value="{{ old('comment') }}">
                 </div>
             </div>
+
             <div class="form-control">
                 <label for="city">Город *</label>
+                @error('city')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
                 <div>
                     <span class="fa fa-user-circle"></span>
-                    <input type="text" id="city" name="city" placeholder="Введите ваш город...">
+                    <input type="text" id="city" name="city" placeholder="Введите ваш город..." value="{{ old('city') }}">
                 </div>
             </div>
+
             <div class="form-group">
                 <div class="form-control">
                     <label for="delivery_date">Дата доставки *</label>
+                    @error('delivery_date')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <div>
                         <span class="fa fa-globe"></span>
-                        <input type="date" name="delivery_date" id="delivery_date">
+                        <input type="date" name="delivery_date" id="delivery_date" value="{{ old('delivery_date') }}">
                     </div>
                 </div>
 
                 <div class="form-control">
                     <label for="delivery_time">Время доставки *</label>
+                    @error('delivery_time')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <div>
                         <span class="fa fa-globe"></span>
-                        <input type="time" name="delivery_time" id="delivery_time">
+                        <input type="time" name="delivery_time" id="delivery_time" value="{{ old('delivery_time') }}">
                     </div>
                 </div>
             </div>
-{{--            <div class="form-control checkbox-control">--}}
-{{--                <input type="checkbox" name="checkout-checkbox" id="checkout-checkbox">--}}
-{{--                <label for="checkout-checkbox">Save this information for next time</label>--}}
-{{--            </div>--}}
+
             @csrf
             <div class="form-control-btn">
                 <button>Оформить</button>
@@ -148,15 +193,15 @@
             @endforeach
             <div class="checkout-shipping">
                 <h6>Доставка:</h6>
-                <p>{{$deliveryAmount}} ₽</p>
+                <p>{{$totals['deliveryAmount']}} ₽</p>
             </div>
                 <div class="checkout-shipping">
                     <h6>Итого:</h6>
-                    <p>{{$totalPrice}} ₽</p>
+                    <p>{{$totals['totalPrice']}} ₽</p>
                 </div>
             <div class="checkout-total">
                 <h6>Всего к оплате:</h6>
-                <p>{{$totalToBePaid}} ₽</p>
+                <p>{{$totals['totalToBePaid']}} ₽</p>
             </div>
         </div>
     </section>

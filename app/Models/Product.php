@@ -45,26 +45,4 @@ class Product extends Model
     {
         return $this->belongsToMany(UserProduct::class);
     }
-
-//    /**
-//     * The attributes that should be hidden for serialization.
-//     *
-//     * @var array<int, string>
-//     */
-//    protected $hidden = [
-//        'password'
-//    ];
-//
-//    /**
-//     * Get the attributes that should be cast.
-//     *
-//     * @return array<string, string>
-//     */
-//    protected function casts(): array
-//    {
-//        return [
-//            'email_verified_at' => 'datetime',
-//            'password' => 'hashed',
-//        ];
-//    }
 }

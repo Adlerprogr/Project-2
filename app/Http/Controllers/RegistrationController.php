@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\MyMail;
+use App\Http\Requests\RegistrationRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Services\RabbitMQService;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
 
 class RegistrationController extends Controller
 {
+    private RabbitMQService $rabbitMQService;
+
+    public function __construct(RabbitMQService $rabbitMQService)
+    {
+        $this->rabbitMQService = $rabbitMQService;
+    }
     // Показать форму регистрации
     public function showRegistrationForm()
     {
@@ -18,30 +22,22 @@ class RegistrationController extends Controller
     }
 
     // Обработка регистрации
-    public function register(Request $request)
+    public function register(RegistrationRequest $request)
     {
-        // Валидация данных
-        $validated = $request->validate([
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
-                'email'=> ' required|string|email|max:255|unique:users',
-                'password' => ' required|string|min:8|confirmed',
-        ]);
-
         // Создаем пользователя
         $user = User::create([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'email' => $validated['email'],
-            'password' => Hash::make ($validated['password']), // Хэшируем пароль
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')), // Хэшируем пароль
         ]);
 
-        // Отправляем письмо подтверждения
-        Mail::to($user->email)->send(new MyMail($user, 'emails.welcome'));
+        // Отправляем данные в очередь RabbitMQ
+        $this->rabbitMQService->sendEmail('email_queue', $user->email, $user->id, 'emails.welcome');
 
-        // Можно автоматически залогинить пользователя или перенаправить на страни
+        // Можно автоматически залогинить пользователя или перенаправить на главную страницу
         // auth()->login($user);
 
-         return redirect('/')->with( 'success', 'Регистрация успешна!');
+        return redirect('/')->with('success', 'Регистрация успешна!');
     }
 }

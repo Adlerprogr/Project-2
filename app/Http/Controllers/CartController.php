@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\UserProduct;
 use App\Services\CartService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CartRequest;
 
 class CartController extends Controller
 {
@@ -23,41 +23,12 @@ class CartController extends Controller
             ->orderBy('id')
             ->get();
 
-        if ($userProducts) {
-            // Инициализация переменной для суммирования
-            $totalQuantity = 0;
-            $totalPrice = 0;
+        $totals = $this->cartService->totals($userProducts);
 
-            // Итерация по продуктам пользователя
-            foreach ($userProducts as $userProduct) {
-                // Добавление количества каждого продукта к общей сумме
-                $totalQuantity  += $userProduct->quantity;
-                $totalPrice     += $userProduct->quantity * $userProduct->product->price;
-            }
-
-            $deliveryAmount = 0;
-
-            if ($totalPrice < 1000) {
-                $deliveryAmount = 200;
-            } elseif ($totalPrice >= 1000 && $totalPrice < 2000) {
-                $deliveryAmount = 150;
-            } elseif ($totalPrice >= 2000) {
-                $deliveryAmount = 0;
-            }
-
-            $totalToBePaid = $deliveryAmount + $totalPrice;
-        } else {
-            // Обработка ситуации, когда корзина пуста
-            $totalQuantity = 0;
-            $totalPrice = 0;
-            $deliveryAmount = 0;
-            $totalToBePaid = 0;
-        }
-
-        return view('cart', compact('userProducts', 'totalQuantity', 'totalPrice', 'deliveryAmount', 'totalToBePaid'));
+        return view('cart', compact('userProducts', 'totals'));
     }
 
-    public function add(Request $request)
+    public function add(CartRequest $request)
     {
         $userId = Auth::id();
         $productId = $request->input('product_id');
@@ -67,7 +38,7 @@ class CartController extends Controller
         return redirect()->back();
     }
 
-    public function remove(Request $request)
+    public function remove(CartRequest $request)
     {
         $userId = Auth::id();
         $productId = $request->input('product_id');

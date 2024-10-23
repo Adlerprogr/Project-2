@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -16,28 +14,25 @@ class LoginController extends Controller
     }
 
     // Обработка входа
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         // Валидация данных
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        $credentials = $request->only('email', 'password');
 
         // Попытка аутентификации
-        if (Auth::attempt(['email' =>$credentials['email'], 'password' => $credentials['password']])) {
+        if (Auth::attempt($credentials)) {
             // Аутентификация успешна
-            return redirect()->intended('/');
+            return redirect()->intended('/main');
         }
 
         // Если логин неудачен, возвращаемся с ошибкой
         return back()->withErrors([
             'email' => 'Неверный email или пароль.',
-        ])->onlyInput(' email');
+        ])->onlyInput('email');
     }
 
     // обработка выхода
-    public function logout(Request $request)
+    public function logout()
     {
         Auth::logout();
         return redirect('/login')->with('success', 'Вы вышли из системы.');
