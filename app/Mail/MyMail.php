@@ -2,32 +2,27 @@
 
 namespace App\Mail;
 
-use App\Models\Order;
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class MyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public User $user;
-    public Order $order;
-    public $template;
+    public array $data;
+    public string $template;
 
-    public function __construct(User $user, Order $order, $template)
+    public function __construct(array $data, string $template)
     {
-        $this->user = $user;
-        $this->order = $order;
-        $this->template = $template;
+        $this->data = $data; // Передаем массив с данными
+        $this->template = $template; // Название шаблона
     }
 
     public function build()
     {
-        return $this->subject('Hallo, Adler')
-            ->view($this->template); // путь к шаблону письма
+        return $this->subject('Notification') // Можно сделать subject динамическим
+            ->view($this->template)
+            ->with($this->data);
     }
 }

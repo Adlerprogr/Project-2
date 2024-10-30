@@ -7,20 +7,15 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    // Показать форму логина
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // Обработка входа
     public function login(LoginRequest $request)
     {
-        // Валидация данных
-        $credentials = $request->only('email', 'password');
-
         // Попытка аутентификации
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($request->only('email', 'password'))) {
             // Аутентификация успешна
             return redirect()->intended('/main');
         }
@@ -31,7 +26,6 @@ class LoginController extends Controller
         ])->onlyInput('email');
     }
 
-    // обработка выхода
     public function logout()
     {
         Auth::logout();

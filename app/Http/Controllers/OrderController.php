@@ -3,22 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
-use App\Models\Order;
-use App\Models\OrderProduct;
 use App\Models\UserProduct;
 use App\Services\CartService;
-use App\Services\RabbitMQService;
+use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     private CartService $cartService;
-    private RabbitMQService $rabbitMQService;
+    private OrderService $orderService;
 
-    public function __construct(CartService $cartService, RabbitMQService $rabbitMQService)
+    public function __construct(CartService $cartService, OrderService $orderService)
     {
         $this->cartService = $cartService;
-        $this->rabbitMQService = $rabbitMQService;
+        $this->orderService = $orderService;
     }
 
     public function orderPage()
@@ -35,32 +34,15 @@ class OrderController extends Controller
 
     public function addOrder(OrderRequest $request)
     {
-        $userId = Auth::id();
-        $order = Order::create(array_merge($request->all(), ['user_id' => $userId]));
+        $user = Auth::user();
 
-        $orderId = $order->id;
-        $userProducts = UserProduct::where('user_id', $userId)->get();
+        try {
+            $this->orderService->createOrder($user, $request);
+            return redirect('/main');
+        } catch (\Exception $e) {
+            Log::error('Ошибка при создании заказа: ' . $e->getMessage());
 
-        foreach ($userProducts as $userProduct) {
-            OrderProduct::create([
-                'product_id' => $userProduct->product_id,
-                'order_id' => $orderId,
-                'quantity' => $userProduct->quantity,
-                'price' => 200,
-            ]);
+            return redirect()->back()->withErrors(['error' => 'Произошла ошибка при создании заказа.']);
         }
-
-        UserProduct::where('user_id', $userId)->delete();
-        $user = Auth::user(); // Получаем текущего пользователя
-
-        // Отправляем данные в очередь RabbitMQ
-        $this->rabbitMQService->publishMessage('email_queue', [
-            'email' => $order->email,
-            'user' => $user->id,
-            'order' => $order->id,
-            'view' => 'emails.orderPlaced',
-        ]);
-
-        return redirect('/main');
     }
 }

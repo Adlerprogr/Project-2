@@ -11,11 +11,6 @@ class OrderProduct extends Model
 
     protected $table = 'order_product';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'product_id',
         'order_id',

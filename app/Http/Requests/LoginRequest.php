@@ -26,7 +26,6 @@ class LoginRequest extends FormRequest
             'email.required' => 'Поле email обязательно для заполнения.',
             'email.email' => 'Введите корректный email адрес.',
             'password.required' => 'Поле пароль обязательно для заполнения.',
-            'password.string' => 'Пароль должен быть строкой.',
         ];
     }
 }

@@ -11,11 +11,6 @@ class UserProduct extends Model
 
     protected $table = 'user_product';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'product_id',

@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\UserProduct;
-use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Expr\Cast\Object_;
 
 class CartService
 {

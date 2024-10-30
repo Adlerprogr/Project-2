@@ -3,41 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegistrationRequest;
+use App\Jobs\SendEmailJob;
 use App\Models\User;
-use App\Services\RabbitMQService;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class RegistrationController extends Controller
 {
-    private RabbitMQService $rabbitMQService;
-
-    public function __construct(RabbitMQService $rabbitMQService)
-    {
-        $this->rabbitMQService = $rabbitMQService;
-    }
-    // Показать форму регистрации
     public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
-    // Обработка регистрации
     public function register(RegistrationRequest $request)
     {
-        // Создаем пользователя
-        $user = User::create([
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')), // Хэшируем пароль
-        ]);
+        try {
+            // Создаем пользователя
+            $user = User::create([
+                'first_name' => $request->input('first_name'),
+                'last_name' => $request->input('last_name'),
+                'email' => $request->input('email'),
+                'password' => Hash::make($request->input('password')),
+            ]);
 
-        // Отправляем данные в очередь RabbitMQ
-        $this->rabbitMQService->sendEmail('email_queue', $user->email, $user->id, 'emails.welcome');
+            // Данные для email
+            $data = ['user' => $user];
 
-        // Можно автоматически залогинить пользователя или перенаправить на главную страницу
-        // auth()->login($user);
+            // Отправляем Job в очередь
+            SendEmailJob::dispatch($data['user']->email, $data, 'emails.welcome');
 
-        return redirect('/')->with('success', 'Регистрация успешна!');
+//            // Логиним пользователя (опционально)
+//             auth()->login($user);
+
+            return redirect('/main')->with('success', 'Регистрация успешна!');
+        } catch (\Exception $e) {
+            Log::error('Ошибка при регистрации: ' . $e->getMessage());
+
+            return redirect()->back()->withErrors(['error' => 'Ошибка при регистрации. Попробуйте снова.']);
+        }
     }
 }

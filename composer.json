@@ -11,7 +11,8 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "swiftmailer/swiftmailer": "^5.4",
-        "php-amqplib/php-amqplib": "^3.2"
+        "php-amqplib/php-amqplib": "^3.2",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
