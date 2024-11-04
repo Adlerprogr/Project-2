@@ -12,7 +12,7 @@ class CategoryFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->word, // Генерируем случайное название категории
+            'name' => $this->faker->unique()->word, // Генерируем случайное название категории
         ];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AddProductController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +21,11 @@ Route::post ('/register', [RegistrationController::class, 'register']);
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login' ]);
 Route:: post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::post('/images', [ImageController::class, 'store']);
+
+Route::get('/products/create', [AddProductController::class, 'page'])->name('product.create');
+Route::post('/products', [AddProductController::class, 'add'])->name('product.store');
 
 Route::group(['middleware' => 'auth'], function () {
     // Все маршруты в этой группе требуют авторизации

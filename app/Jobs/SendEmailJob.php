@@ -15,9 +15,9 @@ class SendEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $email;
-    public array $data;
-    public string $template;
+    protected string $email;
+    protected array $data;
+    protected string $template;
 
     public function __construct(string $email, array $data, string $template)
     {
@@ -26,12 +26,13 @@ class SendEmailJob implements ShouldQueue
         $this->template = $template;
     }
 
-    public function handle()
+    public function handle(): void
     {
         try {
             Mail::to($this->email)->send(new MyMail($this->data, $this->template));
+            Log::info("Email '{$this->template}' успешно отправлен на адрес '{$this->email}'");
         } catch (\Exception $e) {
-            Log::error("Ошибка отправки email: " . $e->getMessage());
+            Log::error("Ошибка отправки email '{$this->template}' на адрес '{$this->email}': " . $e->getMessage());
         }
     }
 }

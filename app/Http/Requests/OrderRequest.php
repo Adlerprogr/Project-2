@@ -6,17 +6,18 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class OrderRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         // Разрешаем выполнение запроса авторизованным пользователям
         return auth()->check();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'email' => 'required|email',
-            'phone' => 'required|string|min:11|max:11',
+            'phone' => 'required|string|digits:11',
+//            'phone' => ['required', 'string', Phone::class],
             'last_name' => 'required|string|max:50',
             'address' => 'required|string|max:100',
             'city' => 'required|string|max:50',
@@ -30,19 +31,79 @@ class OrderRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
-            'email.required' => 'Введите ваш email.',
-            'email.email' => 'Введите корректный email.',
-            'phone.required' => 'Введите ваш телефон.',
-            'phone.min' => 'Номер телефона должен содержать 11 цифр.',
-            'last_name.required' => 'Введите вашу фамилию.',
-            'address.required' => 'Введите ваш адрес.',
-            'city.required' => 'Введите ваш город.',
-            'entrance.required' => 'Введите номер подъезда.',
-            'floor.required' => 'Введите этаж.',
-            'flat.required' => 'Введите номер квартиры.',
+            'email' => $this->emailMessages(),
+            'phone' => $this->phoneMessages(),
+            'last_name' => $this->lastNameMessages(),
+            'address' => $this->addressMessages(),
+            'city' => $this->cityMessages(),
+            'entrance' => $this->entranceMessages(),
+            'floor' => $this->floorMessages(),
+            'flat' => $this->flatMessages(),
+        ];
+    }
+
+    protected function emailMessages(): array
+    {
+        return [
+            'required' => 'Введите ваш email.',
+            'email' => 'Введите корректный email.',
+        ];
+    }
+
+    protected function phoneMessages(): array
+    {
+        return [
+            'required' => 'Введите ваш телефон.',
+            'min' => 'Номер телефона должен содержать 11 цифр.',
+            'max' => 'Номер телефона не может превышать 11 цифр.',
+        ];
+    }
+
+    protected function lastNameMessages(): array
+    {
+        return [
+            'required' => 'Введите вашу фамилию.',
+        ];
+    }
+
+    protected function addressMessages(): array
+    {
+        return [
+            'required' => 'Введите ваш адрес.',
+        ];
+    }
+
+    protected function cityMessages(): array
+    {
+        return [
+            'required' => 'Введите ваш город.',
+        ];
+    }
+
+    protected function entranceMessages(): array
+    {
+        return [
+            'required' => 'Введите номер подъезда.',
+            'integer' => 'Номер подъезда должен быть числом.',
+        ];
+    }
+
+    protected function floorMessages(): array
+    {
+        return [
+            'required' => 'Введите этаж.',
+            'integer' => 'Этаж должен быть числом.',
+        ];
+    }
+
+    protected function flatMessages(): array
+    {
+        return [
+            'required' => 'Введите номер квартиры.',
+            'integer' => 'Номер квартиры должен быть числом.',
         ];
     }
 }

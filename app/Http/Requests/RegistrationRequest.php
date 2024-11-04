@@ -6,23 +6,24 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RegistrationRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         // Разрешаем выполнение запроса
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+//            'password' => ['required', 'string', 'min:8', 'confirmed', Password::min(8)->letters()->numbers()->mixedCase()->symbols()],
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'first_name.required' => 'Введите ваше имя.',

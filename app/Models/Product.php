@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 
 class Product extends Model
@@ -26,17 +28,17 @@ class Product extends Model
         'quantity'
     ];
 
-    public function category()
+    public function category(): BelongsTo
     {
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function images()
+    public function image(): BelongsTo
     {
-        return $this->hasOne(Image::class);
+        return $this->belongsTo(Image::class, 'image_id');
     }
 
-    public function userProducts()
+    public function userProducts(): BelongsToMany
     {
         return $this->belongsToMany(UserProduct::class);
     }

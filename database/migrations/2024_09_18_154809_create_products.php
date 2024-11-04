@@ -23,8 +23,8 @@ return new class extends Migration
             $table->integer('carbohydrates');
             $table->integer('weight');
             $table->decimal('price', 10, 2);
-//            $table->unsignedBigInteger('image_id');
-//            $table->foreign('image_id')->references('id')->on('images'); // Предполагая "images" таблица существует
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->foreign('image_id')->references('id')->on('images')->onDelete('set null');
             $table->integer('quantity');
             $table->timestamps();
         });
@@ -35,6 +35,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropForeign(['image_id']);
+            $table->dropColumn('image_id');
+        });
     }
 };

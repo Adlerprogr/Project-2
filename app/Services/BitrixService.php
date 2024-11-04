@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\RequestException;
 
 class BitrixService
 {
@@ -18,18 +19,22 @@ class BitrixService
         $this->webhookKey = config('bitrix.webhook_key');
     }
 
-    protected function request(string $method, array $params = [])
+    protected function request(string $method, array $params = []): ?array
     {
-        $response = Http::post("{$this->url}{$this->userId}/{$this->webhookKey}/{$method}", $params);
+        try {
+            $response = Http::post("{$this->url}{$this->userId}/{$this->webhookKey}/{$method}", $params);
 
-        // Логируем запрос и ответ
-        Log::info("Запрос к Bitrix: {$method}", ['params' => $params]);
-        Log::info("Ответ от Bitrix: {$method}", ['response' => $response->json()]);
-
-        return $response->json();
+            return $response->json() ?: null; // Возвращаем null, если ответ пуст
+        } catch (RequestException $e) {
+            Log::error("Ошибка при запросе к Bitrix: {$method}", [
+                'error' => $e->getMessage(),
+                'params' => $params,
+            ]);
+            return null; // Возвращаем null при ошибке
+        }
     }
 
-    public function createLead(array $leadData)
+    public function createLead(array $leadData): ?array
     {
         return $this->request('crm.lead.add', [
             'fields' => $leadData,
@@ -37,7 +42,7 @@ class BitrixService
         ]);
     }
 
-    public function updateLead($leadId, array $leadData)
+    public function updateLead(int $leadId, array $leadData): ?array
     {
         return $this->request('crm.lead.update', [
             'id' => $leadId,
@@ -45,7 +50,7 @@ class BitrixService
         ]);
     }
 
-    public function getLead($leadId)
+    public function getLead(int $leadId): ?array
     {
         return $this->request('crm.lead.get', [
             'id' => $leadId,

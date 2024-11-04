@@ -30,10 +30,10 @@ class RegistrationController extends Controller
             $data = ['user' => $user];
 
             // Отправляем Job в очередь
-            SendEmailJob::dispatch($data['user']->email, $data, 'emails.welcome');
+            SendEmailJob::dispatch($user->email, $data, 'emails.welcome');
 
-//            // Логиним пользователя (опционально)
-//             auth()->login($user);
+//            // Логиним пользователя
+            auth()->login($user);
 
             return redirect('/main')->with('success', 'Регистрация успешна!');
         } catch (\Exception $e) {

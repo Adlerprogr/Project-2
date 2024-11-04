@@ -20,7 +20,7 @@ class MainController extends Controller
         $this->currencyService = $currencyService;
     }
 
-    public function mainPage($showInUSD = false)
+    public function mainPage(bool $showInUSD = false)
     {
         $products = Product::all();
 
@@ -32,8 +32,10 @@ class MainController extends Controller
 
         $exchangeRate = null;
 
+        // Конвертация цен в USD, если необходимо
         if ($showInUSD) {
             $exchangeRate = $this->currencyService->getExchangeRate();
+
             if ($exchangeRate) {
                 $products = $products->map(function ($product) use ($exchangeRate) {
                     $product->price_usd = $this->currencyService->convertPrice($product->price, $exchangeRate);

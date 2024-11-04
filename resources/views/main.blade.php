@@ -9,7 +9,7 @@
                 <div class="product-card">
                     <a class="bk" href="{{ route('product.show', ['id' => $product->id]) }}">
                         <div class="image-container">
-                            <img src="https://retailwire.com/wp-content/uploads/zcdayrowlc0.jpg" alt="Morning Set">
+                            <img src="{{ asset('storage/' . $product->image->way) }}" alt="Morning Set">
                         </div>
                         <div class="product-info">
                             <p>{{ $product->weight }} г.</p>

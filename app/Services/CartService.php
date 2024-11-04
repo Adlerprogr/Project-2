@@ -3,80 +3,76 @@
 namespace App\Services;
 
 use App\Models\UserProduct;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class CartService
 {
-    public function addProduct(int $userId, int $productId)
+    public function addProduct(int $userId, int $productId): void
     {
-        // Проверка, есть ли уже этот продукт в корзине пользователя
-        $productExists = UserProduct::where('user_id', $userId)
-            ->where('product_id', $productId)
-            ->first();
+        try {
+            $productExists = UserProduct::where('user_id', $userId)
+                ->where('product_id', $productId)
+                ->first();
 
-        if ($productExists) {
-            // Если продукт уже в корзине, увеличиваем количество
-            $productExists->increment('quantity');
-        } else {
-            // Если продукта нет в корзине, создаем новую запись
-            UserProduct::create([
-                'user_id' => $userId, // ID текущего пользователя
-                'product_id' => $productId,
-                'quantity' => 1,
-            ]);
-        }
-    }
-
-    public function removeProduct(int $userId, int $productId)
-    {
-        // Проверка, есть ли уже этот продукт в корзине пользователя
-        $productExists = UserProduct::where('user_id', $userId)
-            ->where('product_id', $productId)
-            ->first();
-
-        if ($productExists) {
-            if ($productExists->quantity > 1) {
-                // Если количество больше 1, уменьшаем на 1
-                $productExists->decrement('quantity');
+            if ($productExists) {
+                $productExists->increment('quantity');
             } else {
-                // Если количество равно 1, удаляем запись
-                $productExists->delete();
+                UserProduct::create([
+                    'user_id' => $userId,
+                    'product_id' => $productId,
+                    'quantity' => 1,
+                ]);
             }
+        } catch (\Exception $e) {
+            Log::error('Ошибка при добавлении продукта в корзину: ' . $e->getMessage());
         }
     }
 
-    public function totals(Object $userProducts)
+    public function removeProduct(int $userId, int $productId): void
     {
-        // Инициализация переменных
-        $totalQuantity = 0;
-        $totalPrice = 0;
-        $deliveryAmount = 0;
+        try {
+            $productExists = UserProduct::where('user_id', $userId)
+                ->where('product_id', $productId)
+                ->first();
 
-        if ($userProducts) {
-            // Итерация по продуктам пользователя
-            foreach ($userProducts as $userProduct) {
-                // Добавление количества каждого продукта к общей сумме
-                $totalQuantity += $userProduct->quantity;
-                $totalPrice += $userProduct->quantity * $userProduct->product->price;
+            if ($productExists) {
+                $productExists->quantity > 1 ? $productExists->decrement('quantity') : $productExists->delete();
             }
+        } catch (\Exception $e) {
+            Log::error('Ошибка при удалении продукта из корзины: ' . $e->getMessage());
         }
+    }
+
+    public function clearUserProducts(int $userId): void
+    {
+        try {
+            UserProduct::where('user_id', $userId)->delete();
+        } catch (\Exception $e) {
+            Log::error('Ошибка при очистке корзины пользователя: ' . $e->getMessage());
+        }
+    }
+
+    public function totals(Collection $userProducts): array
+    {
+        $totalPrice = $userProducts->sum(function ($userProduct) {
+            return $userProduct->quantity * $userProduct->product->price;
+        });
+
+        $totalQuantity = $userProducts->sum('quantity');
 
         // Определяем стоимость доставки
-        if ($totalPrice < 1000) {
-            $deliveryAmount = 200;
-        } elseif ($totalPrice >= 1000 && $totalPrice < 2000) {
-            $deliveryAmount = 150;
-        } elseif ($totalPrice >= 2000) {
-            $deliveryAmount = 0;
-        }
-
-        // Подсчитываем общую сумму к оплате
-        $totalToBePaid = $totalPrice + $deliveryAmount;
+        $deliveryAmount = match (true) {
+            $totalPrice < 1000 => 200,
+            $totalPrice < 2000 => 150,
+            default => 0,
+        };
 
         return [
             'totalQuantity' => $totalQuantity,
             'totalPrice' => $totalPrice,
             'deliveryAmount' => $deliveryAmount,
-            'totalToBePaid' => $totalToBePaid
+            'totalToBePaid' => $totalPrice + $deliveryAmount,
         ];
     }
 }

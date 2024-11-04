@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Http\Requests\OrderRequest;
+use App\DTO\OrderDTO;
+use App\Jobs\CreateLeadJob;
 use App\Models\Order;
-use App\Models\OrderProduct;
-use App\Models\User;
-use App\Models\UserProduct;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendEmailJob;
@@ -14,97 +12,83 @@ use App\Jobs\SendEmailJob;
 class OrderService
 {
     private BitrixService $bitrixService;
+    private OrderProductService  $orderProductService;
+    private CartService  $cartService;
 
-    public function __construct(BitrixService $bitrixService)
+    public function __construct(BitrixService $bitrixService, OrderProductService $orderProductService, CartService $cartService)
     {
         $this->bitrixService = $bitrixService;
+        $this->orderProductService = $orderProductService;
+        $this->cartService = $cartService;
     }
- // dto я передачи данных
-    public function createOrder(User|null $user, OrderRequest $request)
-    {
-        $userId = $user->id;
 
+    public function createOrder(OrderDTO $orderData)
+    {
         try {
-            DB::transaction(function () use ($request, $userId, &$order) {
-                $order = Order::create(array_merge($request->all(), ['user_id' => $userId]));
-                $this->createOrderProducts($order->id, $userId);
-                $this->clearUserProducts($userId);
+            DB::transaction(function () use ($orderData, &$order) {
+                $order = $this->createOrderRecord($orderData);
+                $this->orderProductService->createOrderProducts($order->id, $orderData->userId);
+                $this->cartService->clearUserProducts($orderData->userId);
             });
 
-            // Создание лида в Bitrix
-            $this->createLead($request, $order);
-
-            // Отправка Email
-            $this->sendOrderEmail($user, $order);
+            // Создаем лид и отправляем email асинхронно
+            $this->queueLeadCreation($orderData, $order);
+            $this->queueOrderEmail($orderData, $order);
         } catch (\Exception $e) {
             Log::error('Ошибка при создании заказа: ' . $e->getMessage(), [
-                'user_id' => $userId,
-                'request_data' => $request->all(),
+                'user_id' => $orderData->userId, // если доступно
+                'order_data' => $orderData, // подробные данные заказа
             ]);
 
-            throw $e; // Бросаем исключение для обработки в контроллере
+            throw $e;
         }
     }
 
-    private function createOrderProducts(int $orderId, int $userId)
+    private function createOrderRecord(OrderDTO $orderData): Order
     {
-        $userProducts = UserProduct::where('user_id', $userId)->get();
-
-        foreach ($userProducts as $userProduct) {
-            OrderProduct::create([
-                'product_id' => $userProduct->product_id,
-                'order_id' => $orderId,
-                'quantity' => $userProduct->quantity,
-                'price' => 200,
-            ]);
-        }
+        return Order::create([
+            'user_id' => $orderData->userId,
+            'last_name' => $orderData->lastName,
+            'email' => $orderData->email,
+            'phone' => $orderData->phone,
+            'address' => $orderData->address,
+            'entrance' => $orderData->entrance,
+            'floor' => $orderData->floor,
+            'flat' => $orderData->flat,
+            'intercom' => $orderData->intercom,
+            'comment' => $orderData->comment,
+            'city' => $orderData->city,
+        ]);
     }
 
-    private function clearUserProducts(int $userId)
+    private function prepareLeadData(OrderDTO $orderData, Order $order): array
     {
-        UserProduct::where('user_id', $userId)->delete();
-    }
-
-    private function createLead(OrderRequest $request, Order $order)
-    {
-        $leadData = [
+        return [
             'TITLE' => 'Заказ #' . $order->id,
-            'LAST_NAME' => $order->last_name ?? 'Имя не указано',
-            'EMAIL' => [
-                [
-                    'VALUE' => $order->email,
-                    'VALUE_TYPE' => 'WORK'
-                ]
-            ],
-            'PHONE' => [
-                [
-                    'VALUE' => $order->phone ?? 'Не указан',
-                    'VALUE_TYPE' => 'WORK'
-                ]
-            ],
-            // Новые поля для лида
-            'ADDRESS' => $request->input('address'),
-            'ENTRANCE' => $request->input('entrance'),
-            'FLOOR' => $request->input('floor'),
-            'FLAT' => $request->input('flat'),
-            'INTERCOM' => $request->input('intercom'),
-            'COMMENT' => $request->input('comment'),
-            'CITY' => $request->input('city'),
+            'LAST_NAME' => $orderData->lastName,
+            'EMAIL' => [['VALUE' => $orderData->email, 'VALUE_TYPE' => 'WORK']],
+            'PHONE' => [['VALUE' => $orderData->phone, 'VALUE_TYPE' => 'WORK']],
+            'ADDRESS' => $orderData->address,
+            'ENTRANCE' => $orderData->entrance,
+            'FLOOR' => $orderData->floor,
+            'FLAT' => $orderData->flat,
+            'INTERCOM' => $orderData->intercom,
+            'COMMENT' => $orderData->comment,
+            'CITY' => $orderData->city,
         ];
-
-        $response = $this->bitrixService->createLead($leadData);
-        if (isset($response['error'])) {
-            Log::error('Ошибка при создании лида в Bitrix: ' . $response['error_description']);
-        }
     }
 
-    private function sendOrderEmail(User $user, Order $order)
+    private function queueLeadCreation(OrderDTO $orderData, Order $order)
     {
-        $data = [
-            'user' => $user,
-            'order' => $order,
-        ];
+        $leadData = $this->prepareLeadData($orderData, $order);
 
-        SendEmailJob::dispatch($order->email, $data, 'emails.orderPlaced');
+        // Используем специализированный Job для создания лида
+        dispatch(new CreateLeadJob($leadData, $this->bitrixService));
+    }
+
+    private function queueOrderEmail(OrderDTO $orderData, Order $order)
+    {
+        // Используем очередь для отправки email
+        SendEmailJob::dispatch($orderData->email, ['order' => $order], 'emails.orderPlaced');
     }
 }

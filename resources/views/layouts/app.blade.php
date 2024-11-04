@@ -19,6 +19,12 @@
                 </button>
             </a>
         </div>
+
+        <a href="http://localhost/products/create">
+            <button class="cart-button" type="submit">
+                <span style="color: #121618">Add</span>
+            </button>
+        </a>
     </div>
     <ul class="nav active">
         <form action="{{ route('convert.prices') }}" method="POST">

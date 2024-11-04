@@ -6,13 +6,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         // Разрешаем запросы только авторизованным пользователям
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'email' => 'required|email',
@@ -20,12 +20,26 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
-            'email.required' => 'Поле email обязательно для заполнения.',
-            'email.email' => 'Введите корректный email адрес.',
-            'password.required' => 'Поле пароль обязательно для заполнения.',
+            'email' => $this->emailMessages(),
+            'password' => $this->passwordMessages(),
+        ];
+    }
+
+    protected function emailMessages(): array
+    {
+        return [
+            'required' => 'Поле email обязательно для заполнения.',
+            'email' => 'Введите корректный email адрес.',
+        ];
+    }
+
+    protected function passwordMessages(): array
+    {
+        return [
+            'required' => 'Поле пароль обязательно для заполнения.',
         ];
     }
 }

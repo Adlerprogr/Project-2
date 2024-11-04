@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\OrderDTO;
 use App\Http\Requests\OrderRequest;
 use App\Models\UserProduct;
 use App\Services\CartService;
@@ -27,6 +28,11 @@ class OrderController extends Controller
             ->orderBy('id')
             ->get();
 
+        // Проверка на наличие товаров в корзине
+        if ($userProducts->isEmpty()) {
+            return redirect('/cart')->with('info', 'Ваша корзина пуста. Пожалуйста, добавьте товары для заказа.');
+        }
+
         $totals = $this->cartService->totals($userProducts);
 
         return view('order', compact('userProducts', 'totals'));
@@ -37,8 +43,13 @@ class OrderController extends Controller
         $user = Auth::user();
 
         try {
-            $this->orderService->createOrder($user, $request);
-            return redirect('/main');
+            // Создаем объект данных для заказа из запроса
+            $orderData = OrderDTO::fromRequest($request, $user->id);
+
+            // Создаем заказ через OrderService
+            $this->orderService->createOrder($orderData);
+
+            return redirect('/main')->with('success', 'Заказ успешно создан!');
         } catch (\Exception $e) {
             Log::error('Ошибка при создании заказа: ' . $e->getMessage());
 
