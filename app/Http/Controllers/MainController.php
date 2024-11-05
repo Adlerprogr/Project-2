@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\UserProduct;
 use App\Services\CartService;
@@ -23,6 +24,7 @@ class MainController extends Controller
     public function mainPage(bool $showInUSD = false)
     {
         $products = Product::all();
+        $categoryProducts = Product::where('category_id', 1)->get();
 
         $userProducts = UserProduct::where('user_id', Auth::id())
             ->orderBy('id')
@@ -44,7 +46,7 @@ class MainController extends Controller
             }
         }
 
-        return view('main', compact('products', 'totals', 'showInUSD', 'exchangeRate'));
+        return view('main', compact('products', 'totals', 'showInUSD', 'exchangeRate', 'categoryProducts'));
     }
 
     public function convertPrices()

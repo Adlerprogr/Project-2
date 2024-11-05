@@ -5,6 +5,61 @@
 @section('content')
     <div class="container">
         <div class="row">
+            <div class="title-box">
+                <h1>САЛАТЫ И ЗАКУСКИ</h1>
+            </div>
+            @foreach ($categoryProducts as $categoryProduct)
+                <div class="product-card">
+                    <a class="bk" href="{{ route('product.show', ['id' => $categoryProduct->id]) }}">
+                        <div class="image-container">
+                            <img src="{{ asset('storage/' . $categoryProduct->image->way) }}" alt="Morning Set">
+                        </div>
+                        <div class="product-info">
+                            <p>{{ $categoryProduct->weight }} г.</p>
+                            <h2>{{ $categoryProduct->name }}</h2>
+                            <div class="price-order">
+                                <span class="price">
+                                    @if($showInUSD)
+                                        {{ number_format($categoryProduct->price * $exchangeRate, 2) }} $
+                                    @else
+                                        {{ number_format($categoryProduct->price, 2) }} ₽
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="quantity_inner">
+                                <form name='delete_product' action="{{ route('delete-product') }}" method="POST">
+
+                                    <input type="hidden" name="product_id" placeholder="Product ID" required="required" value="{{$categoryProduct->id}}" />
+                                    <input type="hidden" name="quantity" placeholder="Quantity" required="required" value = 1 />
+
+                                    @csrf
+                                    <button class="bt_minus">
+                                        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    </button>
+
+                                </form>
+
+                                <input type="number" value="1" size="2" name="quantity" class="quantity" min="1" max="10" readonly/>
+
+                                <form name='plus_product' action="{{ route('plus-product') }}" method="POST">
+
+                                    <input type="hidden" name="product_id" placeholder="Product ID" required="required" value="{{$categoryProduct->id}}" />
+                                    <input type="hidden" name="quantity" placeholder="Quantity" required="required" value = 1 />
+
+                                    @csrf
+                                    <button class="bt_plus">
+                                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    </button>
+
+                                </form>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            @endforeach
+            <div class="title-box">
+                <h1>ВСЕ ПРОДУКТЫ</h1>
+            </div>
             @foreach ($products as $product)
                 <div class="product-card">
                     <a class="bk" href="{{ route('product.show', ['id' => $product->id]) }}">
@@ -665,4 +720,9 @@
         stroke: #FFF;
     }
     /*Конец стиля кнопок + и -*/
+
+    .title-box >h1 {
+        font-size: 2.4rem;
+        text-align: center;
+    }
 </style>

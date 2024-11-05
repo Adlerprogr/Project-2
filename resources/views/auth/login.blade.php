@@ -291,11 +291,11 @@
                         @enderror
                         <input type="password" name="password" required>
                     </div>
-                    <div class="links">
-                        <a href="#">Forgot Password</a>
-                        <a href="#">Signup</a>
-                    </div>
                     <button class="inputBox" type="submit">Войти</button>
+                    <div class="links">
+                        {{--                        <a href="#">Forgot Password</a>--}}
+                        <a href="#">Регистрация</a>
+                    </div>
                 </form>
             </div>
         </div>
@@ -321,7 +321,7 @@
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        background: #000;
+        background: #665e5e;
     }
     section
     {
@@ -361,13 +361,13 @@
         display: block;
         width: calc(6.25vw - 2px);
         height: calc(6.25vw - 2px);
-        background: #181818;
+        background: #cfcfcf;
         z-index: 2;
         transition: 1.5s;
     }
     section span:hover
     {
-        background: #0f0;
+        background: #fff;
         transition: 0s;
     }
 
@@ -375,7 +375,7 @@
     {
         position: absolute;
         width: 400px;
-        background: #222;
+        background: #d0d0d0;
         z-index: 1000;
         display: flex;
         justify-content: center;
@@ -397,7 +397,7 @@
     section .signin .content h2
     {
         font-size: 2em;
-        color: #0f0;
+        color: #000;
         text-transform: uppercase;
     }
     section .signin .content .form
@@ -417,7 +417,7 @@
     {
         position: relative;
         width: 100%;
-        background: #333;
+        background: #fff;
         border: none;
         outline: none;
         padding: 25px 10px 7.5px;
@@ -452,12 +452,12 @@
     }
     .signin .content .form .links a
     {
-        color: #fff;
+        color: #000;
         text-decoration: none;
     }
     .signin .content .form .links a:nth-child(2)
     {
-        color: #0f0;
+        color: #000;
         font-weight: 600;
     }
     .signin .content .form .inputBox input[type="submit"]
